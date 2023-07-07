@@ -5,6 +5,7 @@ pypath/pypath
 This is a demonstration docstring.
 """
 
+import contextlib
 import os
 from functools import lru_cache
 from pathlib import Path
@@ -37,12 +38,12 @@ class PyPath:
     def input_docstring(self):
         docstring_border_count = 0
         docstring_lines = []
-        for idx, line in enumerate(self.input_pycontent.strip().split("\n")):
-            if idx == 0:
-                if '"""' not in line and "'''" not in line:
-                    break
+        for line_num, line in enumerate(self.input_pycontent.strip().split("\n")):
+            if '"""' in line or "'''" in line:
                 docstring_border_count += 1
                 continue
+            if line_num == 0:
+                break
             if docstring_border_count == 1:
                 docstring_lines.append(line)
         return "\n".join(docstring_lines)
@@ -56,8 +57,10 @@ class PyPath:
         for idx, line in enumerate(input_docstring_array):
             if self._str_likely_a_path(line):
                 file_path = line
-                if self._is_likely_an_underscore(input_docstring_array[idx + 1]):
-                    file_underscore = input_docstring_array[idx + 1]
+                with contextlib.suppress(IndexError):
+                    if self._is_likely_an_underscore(input_docstring_array[idx + 1]):
+                        file_underscore = input_docstring_array[idx + 1]
+                break
         if file_path is None or file_underscore is None:
             return (
                 f"{self.relative_path}\n{self._underscore}\n\n{self.input_docstring}"
