@@ -1,8 +1,6 @@
 """
 pypath/pypath
 ~~~~~~~~~~~~~
-
-This is a demonstration docstring.
 """
 
 import contextlib
@@ -62,6 +60,9 @@ class PyPath:
                         file_underscore = input_docstring_array[idx + 1]
                 break
         if file_path is None or file_underscore is None:
+            lines = self.input_docstring.strip().split("\n")
+            if len(lines) >= 2 and lines[0] == self.relative_path and lines[1] == self._underscore:
+                return self.input_docstring  # Already formatted correctly
             return (
                 f"{self.relative_path}\n{self._underscore}\n\n{self.input_docstring}"
                 if self.input_docstring
